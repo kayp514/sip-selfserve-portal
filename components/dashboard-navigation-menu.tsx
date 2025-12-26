@@ -1,3 +1,5 @@
+'use client';
+
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -6,10 +8,12 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import Link from "next/link";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function DashboardNavigationMenu() {
+  const isMobile = useIsMobile();
   return (
-    <NavigationMenu>
+    <NavigationMenu viewport={isMobile}>
       <NavigationMenuList className="flex-wrap">
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
