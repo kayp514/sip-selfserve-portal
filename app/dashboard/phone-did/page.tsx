@@ -5,7 +5,7 @@ import { fetcher } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 async function DIDs() {
-    'use server'
+  "use server";
   const did = await fetcher(
     "https://sips.lifesprintcare.ca:1443/api/lnpnumbers/"
   );

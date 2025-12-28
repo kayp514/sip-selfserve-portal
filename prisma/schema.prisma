@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum NumberStatus {
+  IMPORTED
+  AVAILABLE
+  RESERVED
+  ASSIGNED
+  SUSPENDED
+  RELEASED
+}
+
+enum NumberType {
+  LOCAL
+  TOLL_FREE
+  NATIONAL
+  MOBILE
+}
+
+enum OnboardingStatus {
+  PENDING       // signed up, not onboarded
+  IN_PROGRESS   // onboarding API call in progress
+  COMPLETED     // successfully onboarded to switch
+  FAILED        // onboarding failed
+}
+
+model customer {
+  id                String            @id @default(cuid())
+  uid      String            @unique 
+  
+  company      String?
+  email             String            @unique
+  contact_id String?          @unique // contact ID on switch server
+  onboarding_status OnboardingStatus  @default(PENDING)
+  onboarded_at      DateTime?
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  
+  subscribers       subscriber[]
+  purchases         ln_purchase[]
+  
+  @@map("customer")
+}
+
+model subscriber {
+  id              String        @id @default(cuid())
+  customer_id     String
+  customer        customer      @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  
+  username        String        
+  display_name    String?
+  email           String?
+  administrative  Boolean
+  
+  // Switch integration
+  switch_user_id  String?       // user ID on switch server
+  
+  is_active       Boolean       @default(true)
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+
+  purchases       ln_purchase[]
+  
+  @@unique([customer_id, username])
+  @@index([customer_id])
+  @@map("subscriber")
+}
+
+model provider {
+  id              String        @id @default(cuid())
+  name            String        @unique
+  display_name    String        
+  
+  api_endpoint    String?
+  api_key         String? 
+  api_secret      String?   
+  account_sid     String? 
+
+  is_active       Boolean       @default(true)
+  default_markup  Decimal?      @db.Decimal(5, 2)
+  priority        Int           @default(0)
+  
+  supports_sms    Boolean       @default(true)
+  supports_voice  Boolean       @default(true)
+  supports_mms    Boolean       @default(false)
+  
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  notes           String?       // internal notes
+  
+  inventory       ln_inventory[]
+  
+  @@map("provider")
+}
+
+model ln_inventory {
+  id            String        @id @default(cuid())
+  number        String        @unique
+  type          NumberType    @default(LOCAL)
+  status        NumberStatus  @default(IMPORTED)
+  country_code  String?
+  area_code     String?
+  region        String?
+  city          String?
+  
+  provider_id   String
+  provider      provider      @relation(fields: [provider_id], references: [id], onDelete: Restrict)
+  external_id   String?       // provider's internal ID for this number
+  
+  monthly_cost  Decimal?      @db.Decimal(10, 4) // cost from provider
+  sale_price    Decimal?      @db.Decimal(10, 4) // price to sell to consumer
+  
+  capabilities  Json?         // SMS, Voice, MMS capabilities
+  imported_at   DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+
+  purchase      ln_purchase?
+  
+  @@index([status, type])
+  @@index([country_code, area_code])
+  @@index([provider_id])
+  @@map("ln_inventory")
+}
+
+
+model ln_purchase {
+  id              String        @id @default(cuid())
+  inventory_id    String        @unique 
+  inventory       ln_inventory  @relation(fields: [inventory_id], references: [id], onDelete: Cascade)
+  
+  // Who purchased (admin customer)
+  customer_id     String
+  customer        customer      @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  
+  // Who it's assigned to (subscriber)
+  subscriber_id   String
+  subscriber      subscriber    @relation(fields: [subscriber_id], references: [id], onDelete: Cascade)
+  
+  // Purchase details
+  purchased_at    DateTime      @default(now())
+  activated_at    DateTime?
+  expires_at      DateTime?
+  auto_renew      Boolean       @default(true)
+  purchase_price  Decimal       @db.Decimal(10, 4)
+  recurring_price Decimal       @db.Decimal(10, 4)
+  is_active       Boolean       @default(true)
+  cancelled_at    DateTime?
+  
+  @@index([customer_id])
+  @@index([subscriber_id])
+  @@index([purchased_at])
+  @@map("ln_purchase")
+}
