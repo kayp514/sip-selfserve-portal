@@ -16,3 +16,9 @@ export type Subscriber = {
     primary_number: string;
     status: "active" | "inactive" | "pending";
 }
+
+export type Carrier = {
+    id: string;
+    name: string;
+    prefix: string;
+}

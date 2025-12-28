@@ -73,31 +73,17 @@ model subscriber {
   @@map("subscriber")
 }
 
-model provider {
-  id              String        @id @default(cuid())
-  name            String        @unique
-  display_name    String        
+model carrier {
+  id         String         @id @default(cuid())
+  name       String         @unique
+  prefix     String       
   
-  api_endpoint    String?
-  api_key         String? 
-  api_secret      String?   
-  account_sid     String? 
-
-  is_active       Boolean       @default(true)
-  default_markup  Decimal?      @db.Decimal(5, 2)
-  priority        Int           @default(0)
+  created_at DateTime       @default(now())
+  updated_at DateTime       @updatedAt
   
-  supports_sms    Boolean       @default(true)
-  supports_voice  Boolean       @default(true)
-  supports_mms    Boolean       @default(false)
+  inventory  ln_inventory[]
   
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
-  notes           String?       // internal notes
-  
-  inventory       ln_inventory[]
-  
-  @@map("provider")
+  @@map("carrier")
 }
 
 model ln_inventory {
@@ -110,9 +96,9 @@ model ln_inventory {
   region        String?
   city          String?
   
-  provider_id   String
-  provider      provider      @relation(fields: [provider_id], references: [id], onDelete: Restrict)
-  external_id   String?       // provider's internal ID for this number
+  carrier_id    String
+  carrier       carrier       @relation(fields: [carrier_id], references: [id], onDelete: Restrict)
+  external_id   String?       // carrier's internal ID for this number
   
   monthly_cost  Decimal?      @db.Decimal(10, 4) // cost from provider
   sale_price    Decimal?      @db.Decimal(10, 4) // price to sell to consumer
@@ -125,7 +111,7 @@ model ln_inventory {
   
   @@index([status, type])
   @@index([country_code, area_code])
-  @@index([provider_id])
+  @@index([carrier_id])
   @@map("ln_inventory")
 }
 
