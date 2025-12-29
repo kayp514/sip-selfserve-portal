@@ -1,13 +1,13 @@
 "use client";
 
-import { didColumns } from "./columns-did";
-import type { DID } from "@/lib/types";
-import { DIDTable } from "./table-did";
+import { didColumns } from "@/components/columns-did";
+import type { DIDDisplay } from "@/lib/types";
+import { DIDTable } from "@/components/table-did";
 
-interface DidClientComponentProps {
-  data: DID[];
+interface DIDsClientComponentProps {
+  data: DIDDisplay[];
 }
 
-export function DIDsClient({ data }: DidClientComponentProps) {
+export function DIDsClient({ data }: DIDsClientComponentProps) {
   return <DIDTable columns={didColumns} data={data} />;
 }

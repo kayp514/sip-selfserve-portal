@@ -1,15 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
   type ColumnDef,
-  type SortingState,
-  type VisibilityState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -19,14 +14,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { DID } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type { DIDDisplay } from "@/lib/types";
+import { PageWrapper, PageHeader } from "@/components/page-layout";
+import { EmptySpace } from "@/components/empty-space";
+import { DIDFilter } from "@/components/did-filter";
+import { DidActionPurchase } from "@/components/did-action-cell";
 
 interface DIDTableProps {
-  columns: ColumnDef<DID>[];
-  data: DID[];
+  columns: ColumnDef<DIDDisplay>[];
+  data: DIDDisplay[];
 }
 
 export function DIDTable({ columns, data }: DIDTableProps) {
+  const router = useRouter();
+
   const table = useReactTable({
     data,
     columns,
@@ -34,7 +38,17 @@ export function DIDTable({ columns, data }: DIDTableProps) {
   });
 
   return (
-    <>
+    <PageWrapper>
+      <PageHeader
+        title="DIDs"
+        actions={
+          <Button onClick={() => router.push("/dashboard/phone-did/new")}>
+            <Plus className="mr-2 h-4 w-4" />
+            Import DID
+          </Button>
+        }
+      />
+      <DIDFilter />
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -66,10 +80,7 @@ export function DIDTable({ columns, data }: DIDTableProps) {
                   if (cell.column.id === "actions") {
                     return (
                       <TableCell key={cell.id} className="px-2 py-3 align-top">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        <DidActionPurchase />
                       </TableCell>
                     );
                   }
@@ -92,12 +103,12 @@ export function DIDTable({ columns, data }: DIDTableProps) {
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                <EmptySpace />
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-    </>
+    </PageWrapper>
   );
 }

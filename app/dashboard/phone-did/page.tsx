@@ -1,15 +1,12 @@
 import { Suspense } from "react";
 import { DIDsClient } from "@/components/did-client";
-import { fetcher } from "@/lib/utils";
+import { listDIDs } from "@/app/action";
 
 export const dynamic = "force-dynamic";
 
 async function DIDs() {
-  "use server";
-  const did = await fetcher(
-    "https://sips.lifesprintcare.ca:1443/api/lnpnumbers/"
-  );
-  return <DIDsClient data={did} />;
+  const did = await listDIDs();
+  return <DIDsClient data={did.data || []} />;
 }
 
 export default function PhoneDIDPage() {

@@ -15,6 +15,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Carrier } from "@/lib/types";
+import { PageWrapper, PageHeader } from "@/components/page-layout";
+import { NewCarrier } from "@/components/new-carrier-dialog";
+import { EmptySpace } from "@/components/empty-space";
 
 interface CarrierTableProps {
   columns: ColumnDef<Carrier>[];
@@ -29,7 +32,8 @@ export function CarrierTable({ columns, data }: CarrierTableProps) {
   });
 
   return (
-    <>
+    <PageWrapper>
+      <PageHeader title="Carriers" actions={<NewCarrier />} />
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -63,12 +67,12 @@ export function CarrierTable({ columns, data }: CarrierTableProps) {
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                <EmptySpace />
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-    </>
+    </PageWrapper>
   );
 }

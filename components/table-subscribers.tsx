@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Subscriber } from "@/lib/types";
+import { EmptySpace } from "@/components/empty-space";
 
 interface SubscribersTableProps {
   columns: ColumnDef<Subscriber>[];
@@ -92,7 +93,7 @@ export function SubscribersTable({ columns, data }: SubscribersTableProps) {
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                <EmptySpace />
               </TableCell>
             </TableRow>
           )}
