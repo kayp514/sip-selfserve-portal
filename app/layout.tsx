@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { TernSecureProvider } from "@tern-secure/nextjs";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,7 +28,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <TernSecureProvider
+          ternUIUrl="https://cdn.jsdelivr.net/npm/@tern-secure/auth@1.1.0-canary.v20251230204656/dist/ternsecure.browser.js"
+          persistence="browserCookie"
+        >
+          {children}
+        </TernSecureProvider>
       </body>
     </html>
   );

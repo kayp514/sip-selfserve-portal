@@ -44,5 +44,5 @@ export function PageHeader({
 }
 
 export function PageWrapper({ children, className }: PageWrapperProps) {
-  return <div className={cn("space-y-6", className)}>{children}</div>;
+  return <div className={cn("space-y-8", className)}>{children}</div>;
 }

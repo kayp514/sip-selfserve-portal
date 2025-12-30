@@ -1,72 +1,47 @@
 "use client";
 
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
 import Link from "next/link";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { HeaderUserActions } from "@/components/header-user-actions";
 
 export function DashboardNavigationMenu() {
-  const isMobile = useIsMobile();
+  const pathname = usePathname();
+
+  const menuItems = [
+    { href: "/dashboard", label: "Overview" },
+    { href: "/dashboard/carrier", label: "Carrier" },
+    { href: "/dashboard/trunk", label: "Trunk" },
+    { href: "/dashboard/phone-did", label: "Phone Numbers" },
+    { href: "/dashboard/subscribers", label: "Subscribers" },
+    { href: "/dashboard/settings", label: "Settings" },
+  ];
+
   return (
     <header className="border-b bg-card shadow-sm">
       <div className="flex items-center justify-between px-8">
-        <NavigationMenu viewport={isMobile}>
-          <NavigationMenuList className="flex-wrap">
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}
-              >
-                <Link href="/dashboard">Overview</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}
-              >
-                <Link href="/dashboard/carrier">Carrier</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}
-              >
-                <Link href="/dashboard/trunk">Trunk</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}
-              >
-                <Link href="/dashboard/phone-did">Phone Numbers</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}
-              >
-                <Link href="/dashboard/subscribers">Subscribers</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}
-              >
-                <Link href="/dashboard/settings">Settings</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        <div className="flex items-center gap-12 h-16">
+          <nav className="flex items-stretch h-full -mb-px">
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  href={item.href}
+                  key={item.href}
+                  className={cn(
+                    "flex items-center px-4 font-medium text-sm transition-all relative border-b-2",
+                    isActive
+                      ? "text-primary border-primary bg-accent/50"
+                      : "text-muted-foreground border-transparent hover:text-foreground hover:bg-accent/30"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+        <HeaderUserActions />
       </div>
     </header>
   );
